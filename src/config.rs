@@ -49,9 +49,14 @@ impl fmt::Display for Error {
 
 #[derive(Deserialize)]
 struct InternalConfig {
+	options: Options,
+	paths: HashMap<String, String>,
+}
+
+#[derive(Deserialize)]
+struct Options {
 	#[serde(rename = "log-file")]
 	log_file: Option<String>,
-	paths: HashMap<String, String>,
 }
 
 fn parse_duration(s: String) -> Result<Duration, Error> {
@@ -82,7 +87,10 @@ pub struct Config {
 impl Config {
 	pub fn read_from(p: &str) -> Result<Self, Error> {
 		let data = fs::read_to_string(p)?;
-		let InternalConfig { log_file, paths } = toml::from_str(&data)?;
+		let InternalConfig {
+			options: Options { log_file },
+			paths,
+		} = toml::from_str(&data)?;
 
 		paths
 			.into_iter()
