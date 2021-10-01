@@ -54,9 +54,10 @@ struct InternalConfig {
 }
 
 #[derive(Deserialize)]
-struct Options {
-	#[serde(rename = "log-file")]
-	log_file: Option<String>,
+#[serde(rename_all = "kebab-case")]
+pub struct Options {
+	pub log_file: Option<String>,
+	pub header: Option<String>,
 }
 
 fn parse_duration(s: String) -> Result<Duration, Error> {
@@ -81,6 +82,7 @@ fn parse_duration(s: String) -> Result<Duration, Error> {
 
 pub struct Config {
 	pub log_file: Option<String>,
+	pub header: String,
 	pub targets: Vec<Target>,
 }
 
@@ -88,10 +90,11 @@ impl Config {
 	pub fn read_from(p: &str) -> Result<Self, Error> {
 		let data = fs::read_to_string(p)?;
 		let InternalConfig {
-			options: Options { log_file },
+			options: Options { log_file, header },
 			paths,
 		} = toml::from_str(&data)?;
 
+		let header = header.unwrap_or_else(|| String::from("---[%x %X]---"));
 		paths
 			.into_iter()
 			.map(|(pat, dur)| -> Result<Target, Error> {
@@ -99,6 +102,10 @@ impl Config {
 				Ok(Target::new(pat, age_limit))
 			})
 			.collect::<Result<Vec<_>, _>>()
-			.map(|targets| Self { log_file, targets })
+			.map(|targets| Self {
+				log_file,
+				header,
+				targets,
+			})
 	}
 }

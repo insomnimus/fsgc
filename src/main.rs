@@ -1,5 +1,3 @@
-#![feature(stdio_locked)]
-
 use std::{
 	error::Error,
 	fs::OpenOptions,
@@ -9,6 +7,7 @@ use std::{
 	},
 };
 
+use chrono::Local;
 use config::Config;
 
 mod app;
@@ -19,11 +18,10 @@ fn run() -> Result<(), Box<dyn Error>> {
 	let m = app::new().get_matches();
 	let config = Config::read_from(m.value_of("config").unwrap())?;
 
-	let mut err_out: Box<dyn Write> = match &config.log_file {
-		None => {
-			let stderr = io::stderr();
-			Box::new(stderr.into_locked())
-		}
+	let stderr = io::stderr();
+
+	let mut log_out: Box<dyn Write> = match &config.log_file {
+		None => Box::new(stderr.lock()),
 		Some(p) => OpenOptions::new()
 			.append(true)
 			.create(true)
@@ -31,10 +29,12 @@ fn run() -> Result<(), Box<dyn Error>> {
 			.map(Box::new)?,
 	};
 
-	writeln!(&mut err_out, "---NEW CYCLE---")?;
+	let now = Local::now();
+	writeln!(&mut log_out, "{}", now.format(&config.header))?;
+
 	for target in &config.targets {
 		if let Err(e) = target.clear() {
-			writeln!(&mut err_out, "{}", e)?;
+			writeln!(&mut log_out, "{}", e)?;
 		}
 	}
 	Ok(())

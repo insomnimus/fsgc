@@ -1,11 +1,11 @@
 [package]
 name = "fsgc"
-version = "0.1.1"
+version = "0.2.0"
 edition = "2018"
 
-# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
+chrono = "0.4.19"
 clap = "3.0.0-beta.4"
 glob = "0.3.0"
 remove_dir_all = "0.7.0"
