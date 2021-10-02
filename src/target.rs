@@ -1,58 +1,15 @@
+mod internal;
+
 use std::{
-	fmt,
 	fs,
-	io,
 	time::{
 		Duration,
 		SystemTime,
 	},
 };
 
+pub use internal::Error;
 use remove_dir_all::remove_dir_all;
-
-#[derive(Debug)]
-pub enum Error {
-	Io(io::Error),
-	Glob(glob::GlobError),
-	Pattern(glob::PatternError),
-	Many(Vec<Self>),
-}
-
-impl std::error::Error for Error {}
-
-impl From<glob::PatternError> for Error {
-	fn from(e: glob::PatternError) -> Self {
-		Self::Pattern(e)
-	}
-}
-
-impl fmt::Display for Error {
-	fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-		match self {
-			Self::Io(e) => write!(f, "{}", e),
-			Self::Glob(e) => write!(f, "{}", e),
-			Self::Pattern(e) => write!(f, "{}", e),
-			Self::Many(errs) => {
-				for e in errs {
-					writeln!(f, "-  {}", e)?;
-				}
-				Ok(())
-			}
-		}
-	}
-}
-
-impl From<io::Error> for Error {
-	fn from(e: io::Error) -> Self {
-		Self::Io(e)
-	}
-}
-
-impl From<glob::GlobError> for Error {
-	fn from(e: glob::GlobError) -> Self {
-		Self::Glob(e)
-	}
-}
 
 pub struct Target {
 	glob: String,
