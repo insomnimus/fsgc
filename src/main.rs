@@ -48,7 +48,7 @@ fn run() -> Result<(), Box<dyn Error>> {
 
 fn main() {
 	if let Err(e) = run() {
-		eprintln!("fatal: {}", e);
+		eprintln!("fatal: {:#?}", e);
 		std::process::exit(1);
 	}
 }
