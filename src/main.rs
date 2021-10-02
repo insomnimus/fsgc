@@ -1,3 +1,8 @@
+mod app;
+mod config;
+mod rule;
+mod target;
+
 use std::{
 	error::Error,
 	fs::OpenOptions,
@@ -9,10 +14,6 @@ use std::{
 
 use chrono::Local;
 use config::Config;
-
-mod app;
-mod config;
-mod target;
 
 fn run() -> Result<(), Box<dyn Error>> {
 	let m = app::new().get_matches();
@@ -48,7 +49,7 @@ fn run() -> Result<(), Box<dyn Error>> {
 
 fn main() {
 	if let Err(e) = run() {
-		eprintln!("fatal: {:#?}", e);
+		eprintln!("fatal: {:?}", e);
 		std::process::exit(1);
 	}
 }

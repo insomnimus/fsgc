@@ -26,7 +26,7 @@ impl From<glob::PatternError> for Error {
 impl fmt::Display for Error {
 	fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
 		match self {
-			Self::Io(e) => write!(f, "{}", e),
+			Self::Io(e) => write!(f, "{:?}", e),
 			Self::Glob(e) => write!(f, "{}", e),
 			Self::Pattern(e) => write!(f, "{}", e),
 			Self::Many(errs) => {

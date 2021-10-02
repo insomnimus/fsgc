@@ -1,13 +1,11 @@
 mod internal;
 
-pub use internal::Error;
 use serde::Deserialize;
 
 use crate::target::Target;
 
 #[derive(Deserialize)]
-#[serde(rename_all = "kebab-case")]
-#[serde(default)]
+#[serde(rename_all = "kebab-case", default, deny_unknown_fields)]
 pub struct Options {
 	pub log_file: Option<String>,
 	pub overwrite_logs: bool,

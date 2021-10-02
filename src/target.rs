@@ -1,24 +1,20 @@
 mod internal;
 
-use std::{
-	fs,
-	time::{
-		Duration,
-		SystemTime,
-	},
-};
+use std::fs;
 
 pub use internal::Error;
 use remove_dir_all::remove_dir_all;
 
+use crate::rule::Rule;
+
 pub struct Target {
 	glob: String,
-	age_limit: Duration,
+	rule: Rule,
 }
 
 impl Target {
-	pub fn new(glob: String, age_limit: Duration) -> Self {
-		Self { glob, age_limit }
+	pub fn new(glob: String, rule: Rule) -> Self {
+		Self { glob, rule }
 	}
 
 	pub fn clear(&self) -> Result<(), Error> {
@@ -27,7 +23,7 @@ impl Target {
 				r.map_err(Error::from)
 					.and_then(|p| {
 						let md = p.metadata()?;
-						if !should_delete(&md, self.age_limit) {
+						if !self.rule.should_delete(&md) {
 							Ok(())
 						} else if md.is_dir() {
 							remove_dir_all(&p).map_err(Error::from)
@@ -45,28 +41,4 @@ impl Target {
 			Err(Error::Many(errs))
 		}
 	}
-}
-
-fn should_delete(md: &fs::Metadata, age_limit: Duration) -> bool {
-	let limit = SystemTime::now() - age_limit;
-
-	if let Ok(created) = md.created() {
-		if created > limit {
-			return false;
-		}
-	}
-
-	if let Ok(modified) = md.modified() {
-		if modified > limit {
-			return false;
-		}
-	}
-
-	if let Ok(accessed) = md.accessed() {
-		if accessed > limit {
-			return false;
-		}
-	}
-
-	true
 }
