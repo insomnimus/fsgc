@@ -32,9 +32,9 @@ The usage is very simple:
 `fsgc [path/to/config]`
 
 You don't have to specify the config file location from the command line, you can just set `FSGC_CONFIG_PATH`
-env variable to the full path of your onfig file.
+env variable to the full path of your config file.
 
->>>
+
 If you don't specify a config file either from the command line or from your env, these locations will be assumed:
 
 -	On Windows: `C:\programdata\fsgc.toml`
@@ -54,7 +54,7 @@ This table is used for general options and all keys are optional:
 If set, every logging goes to this file and not the standard error stream.
 -	`header`: String; The banner printed before each invocation of FSGC.
 This field supports date and time specifiers, more on that below.
--	èrror-prefix`: String; A string that will be printed in front of any error in the logs.
+-	`èrror-prefix`: String; A string that will be printed in front of any error in the logs.
 This field also supports date and time format specifiers.
 -	`òverwrite-logs`: Bool; If set to `true` and there's a log file, the file will be overwritten each time FSGC is invoked.
 
@@ -62,7 +62,7 @@ This field also supports date and time format specifiers.
 This table is where you configure files/ directories and how they should be handled.
 Each entry in this table is in the form
 
-`"path" = <rule>"
+`"path" = <rule>`
 
 Paths may contain spaces or otherwise illegal characters, but make sure to quote them.
 Paths may also contain glob patterns in the style of `bash`.
