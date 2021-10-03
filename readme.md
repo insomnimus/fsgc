@@ -90,7 +90,7 @@ overwrite-logs = false
 ```
 
 ## Duration Format
-The àge` field in the `rule` object is a string with the following format:
+The `age` field in the `rule` object is a string with the following format:
 
 `<number> <unit>`
 
