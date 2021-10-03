@@ -1,3 +1,4 @@
+[target.'cfg(not(target_os = "freebsd"))']
 rustflags = [
 	"-Ctarget-feature=+crt-static",
 ]
