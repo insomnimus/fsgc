@@ -1,5 +1,6 @@
 mod app;
 mod config;
+mod dur;
 mod rule;
 mod target;
 
@@ -14,6 +15,7 @@ use std::{
 
 use chrono::Local;
 use config::Config;
+use target::Target;
 
 fn run() -> Result<(), Box<dyn Error>> {
 	let m = app::new().get_matches();
@@ -37,7 +39,8 @@ fn run() -> Result<(), Box<dyn Error>> {
 	let now = Local::now();
 	writeln!(&mut log_out, "{}", now.format(&config.header))?;
 
-	for target in &targets {
+	for (path, rule) in &targets {
+		let target = Target::new(path, *rule);
 		if let Err(e) = target.clear() {
 			for e in e.into_iter() {
 				writeln!(&mut log_out, "{}{}", &config.error_prefix, e)?;

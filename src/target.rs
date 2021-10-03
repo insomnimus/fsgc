@@ -7,18 +7,18 @@ use remove_dir_all::remove_dir_all;
 
 use crate::rule::Rule;
 
-pub struct Target {
-	glob: String,
+pub struct Target<'a> {
+	glob: &'a str,
 	rule: Rule,
 }
 
-impl Target {
-	pub fn new(glob: String, rule: Rule) -> Self {
+impl<'a> Target<'a> {
+	pub fn new(glob: &'a str, rule: Rule) -> Self {
 		Self { glob, rule }
 	}
 
 	pub fn clear(&self) -> Result<(), Error> {
-		let errs: Vec<_> = glob::glob(&self.glob)?
+		let errs: Vec<_> = glob::glob(self.glob)?
 			.filter_map(|r| {
 				r.map_err(Error::from)
 					.and_then(|p| {

@@ -1,29 +1,28 @@
 use std::{
-	convert::TryFrom,
 	fs,
 	time::{
-		Duration,
+		self,
 		SystemTime,
 	},
 };
 
-use anyhow::{
-	anyhow,
-	bail,
-	ensure,
-	Error,
+use serde::{
+	de::Deserializer,
+	Deserialize,
 };
-use serde::Deserialize;
+
+use crate::dur::Duration;
+
 #[derive(Deserialize)]
 #[serde(untagged)]
-pub enum TomlRule {
-	Simple(String),
-	Detailed(DetailedTomlRule),
+enum TomlRule {
+	Simple(Duration),
+	Detailed(DetailedRule),
 }
 
 #[derive(Deserialize)]
-pub struct DetailedTomlRule {
-	age: String,
+struct DetailedRule {
+	age: Duration,
 	#[serde(default = "return_true")]
 	modified: bool,
 	#[serde(default = "return_true")]
@@ -32,25 +31,40 @@ pub struct DetailedTomlRule {
 	created: bool,
 }
 
-impl From<TomlRule> for DetailedTomlRule {
+impl From<TomlRule> for Rule {
 	fn from(r: TomlRule) -> Self {
 		match r {
 			TomlRule::Simple(age) => Self {
-				age,
+				age: age.0,
 				created: true,
 				modified: true,
 				accessed: false,
 			},
-			TomlRule::Detailed(d) => d,
+			TomlRule::Detailed(d) => Self {
+				age: d.age.0,
+				created: d.created,
+				modified: d.modified,
+				accessed: d.accessed,
+			},
 		}
 	}
 }
 
+#[derive(Copy, Clone)]
 pub struct Rule {
-	pub age: Duration,
-	pub modified: bool,
-	pub accessed: bool,
-	pub created: bool,
+	age: time::Duration,
+	modified: bool,
+	accessed: bool,
+	created: bool,
+}
+
+impl<'de> serde::Deserialize<'de> for Rule {
+	fn deserialize<D>(des: D) -> Result<Self, D::Error>
+	where
+		D: Deserializer<'de>,
+	{
+		TomlRule::deserialize(des).map(Self::from)
+	}
 }
 
 impl Rule {
@@ -88,54 +102,6 @@ impl Rule {
 		}
 
 		true
-	}
-}
-
-fn parse_duration(s: String) -> Result<Duration, Error> {
-	ensure! {
-		s.len() > 1,
-		"invalid time format: {:?}",
-		s,
-	};
-
-	let n: u64 = match s.chars().last().unwrap() {
-		's' | 'S' => 1,
-		'm' | 'M' => 60,
-		'h' | 'H' => 3600,
-		'd' | 'D' => 24 * 3600,
-		'w' | 'W' => 24 * 7 * 3600,
-		invalid => bail!(
-			"invalid time suffix '{}' in {:?}: valid suffixes are [s, m, h, d, w]",
-			invalid,
-			s
-		),
-	};
-
-	s[..(s.len() - 1)]
-		.parse::<u64>()
-		.map(|x| Duration::from_secs(n * x))
-		.map_err(|_| {
-			anyhow!(
-				"invalid duration value: {}: value must be a non-negative integer",
-				&s[..(s.len() - 1)]
-			)
-		})
-}
-
-impl TryFrom<TomlRule> for Rule {
-	type Error = Error;
-
-	fn try_from(r: TomlRule) -> Result<Self, Self::Error> {
-		let r = DetailedTomlRule::from(r);
-		let created = r.created;
-		let modified = r.modified;
-		let accessed = r.accessed;
-		parse_duration(r.age).map(|age| Self {
-			age,
-			created,
-			modified,
-			accessed,
-		})
 	}
 }
 

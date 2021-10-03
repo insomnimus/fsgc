@@ -22,7 +22,7 @@ use crate::{
 #[derive(Deserialize)]
 struct Config {
 	options: Options,
-	rules: HashMap<String, TomlRule>,
+	rules: HashMap<String, Rule>,
 }
 
 impl super::Config {
@@ -31,13 +31,13 @@ impl super::Config {
 
 		let Config { options, rules } = toml::from_str(&data).context("malformed TOML file")?;
 
-		rules
+		let targets = rules
 			.into_iter()
-			.map(|(pat, rule)| -> Result<Target, Error> {
-				let rule = Rule::try_from(rule)?;
-				Ok(Target::new(pat, rule))
+			.map(|(pat, rule)| {
+				Target::new(pat, rule)
 			})
-			.collect::<Result<Vec<_>, _>>()
-			.map(|targets| Self { options, targets })
+			.collect::<Vec<_>>();
+			
+			Ok(Self{options, targets})
 	}
 }

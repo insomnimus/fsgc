@@ -1,8 +1,15 @@
-mod internal;
+use std::{
+	collections::HashMap,
+	fs,
+};
 
+use anyhow::{
+	Context,
+	Error,
+};
 use serde::Deserialize;
 
-use crate::target::Target;
+use crate::rule::Rule;
 
 #[derive(Deserialize)]
 #[serde(rename_all = "kebab-case", default, deny_unknown_fields)]
@@ -24,7 +31,16 @@ impl Default for Options {
 	}
 }
 
+#[derive(Deserialize)]
 pub struct Config {
 	pub options: Options,
-	pub targets: Vec<Target>,
+	#[serde(rename = "rules")]
+	pub targets: HashMap<String, Rule>,
+}
+
+impl Config {
+	pub fn read_from(p: &str) -> Result<Self, Error> {
+		let data = fs::read_to_string(p).with_context(|| format!("unable to read {}", p))?;
+		toml::from_str(&data).context("malformed TOML file")
+	}
 }
