@@ -106,7 +106,7 @@
             {
               "os": "ubuntu-latest",
               "target": "i686-unknown-linux-musl",
-              "name": "fsgc-linux-x32-musl.tar.gz"
+              "name": "fsgc-linux-x86-musl.tar.gz"
             },
             {
               "os": "windows-latest",
