@@ -70,9 +70,9 @@ Paths may also contain glob patterns in the style of `bash`.
 The rule can be specified in two ways:
 
 -	Detailed: `"path" = { age = "duration", created = true, modified = true, accessed = false }`.
-Anything but the `age` can be omitted, in which case the defaults are as shown above.
+  Anything but the `age` can be omitted, in which case the defaults are as shown above.
 -	Simple: `"path" = "duration".
-This is equivalent to `"path" = { age = "duration", created = true, modified = true, accessed = false }`.
+  This is equivalent to `"path" = { age = "duration", created = true, modified = true, accessed = false }`.
 
 ## Example Config File
 
