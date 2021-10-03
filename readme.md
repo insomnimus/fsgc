@@ -1,4 +1,6 @@
 # FSGC - Filesystem Garbage Collector
+[![Build Status](https://github.com/insomnimus/fsgc/actions/workflows/main.yml/badge.svg)](https://github.com/insomnimus/fsgc/actions)
+
 FSGC cleans directories according to some rules you provide.
 
 # Use Case
